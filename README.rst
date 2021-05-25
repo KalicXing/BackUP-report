@@ -17,7 +17,7 @@ Requirements
 ----------------
 Modules contained in the requirements file are required to run this Script
 ```
-    pip3 install -r `requirements.txt <https://github.com/KalicXing/BackUP-report/blob/main/requirements.txt>`_.
+pip install -r `requirements.txt <https://github.com/KalicXing/BackUP-report/blob/main/requirements.txt>`_.
 ```
 
 Expected Report
