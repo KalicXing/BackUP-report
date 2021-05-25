@@ -14,7 +14,7 @@ Modules contained in the requirements file are required to run this Script
 
 .. code-block:: bash
 
-    pip install -r requirements.txt
+    pip3 install -r requirements.txt
 
 
 Expected Report
