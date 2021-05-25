@@ -1,0 +1,5 @@
+beautifulsoup4==4.9.3
+keyring==23.0.1
+requests==2.25.1
+soupsieve==2.2.1
+python-dotenv==0.17.1
