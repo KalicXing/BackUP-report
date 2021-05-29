@@ -35,9 +35,38 @@ class BackUp:
         # Send the combined Report
         send_email.send_email()
 
+    def sanitize_report(self, report):
+        # Store report according to the color codes
+        ok_report = []
+        medium_report = []
+        red_report = []
+
+        for data in report:
+            if 'failed' in data[3]:
+                red_report.append(data)
+            else:
+                medium_report.append(data)
+
+        half_report = [item for elem in (red_report + medium_report) for item in elem]
+
+        # check if a full successful backup was made
+        if self.url_domain not in half_report:
+            ok_report.append([self.url_domain, os.getenv('BACKUP_EMAIL'), "", "All Backed up",
+                              "background-color:#ccffcc"])
+
+        if self.url_domain_gw not in half_report:
+            ok_report.append([self.url_domain_gw, os.getenv('BACKUP_EMAIL_GW'), "", "All Backed up",
+                              "background-color:#ccffcc"])
+
+        if self.url_domain2 not in half_report:
+            ok_report.append([self.url_domain2, os.getenv('BACKUP2_EMAIL'), "", "All Backed up",
+                              "background-color:#ccffcc"])
+
+        return ok_report + medium_report + red_report
+
     def run(self):
         try:
-            # Login to Backups
+            # Login to Backups website
             self.get_data.login()
 
             # Get the Report
@@ -48,27 +77,8 @@ class BackUp:
             # close the session
             self.get_data.s.close()
 
-            # Sanitize the report if no failed Backup
-            self.total_report = [item for elem in self.get_data.report for item in elem]
-
-            # Insert at the last position
-            self.ok = len(self.total_report)
-
-            if self.url_domain not in self.total_report:
-                self.get_data.report.insert(self.ok,
-                                            [self.url_domain, os.getenv('BACKUP_EMAIL'), "", "All Backed up",
-                                             "background-color:#ccffcc"])
-            if self.url_domain_gw not in self.total_report:
-                self.get_data.report.insert(self.ok,
-                                            [self.url_domain_gw, os.getenv('BACKUP_EMAIL_GW'), "", "All Backed up",
-                                             "background-color:#ccffcc"])
-            if self.url_domain2 not in self.total_report:
-                self.get_data.report.insert(self.ok,
-                                            [self.url_domain2, os.getenv('BACKUP2_EMAIL'), "", "All Backed up",
-                                             "background-color:#ccffcc"])
-
-            # Send the report data on email but in reverse order
-            self.send_email(self.get_data.report[::-1])
+            # Send the sanitized report data on email
+            self.send_email(self.sanitize_report(self.get_data.report))
 
         except requests.exceptions.ConnectionError as error:
             self.send_email(f"Unable to Access URL \n\n {error}")
