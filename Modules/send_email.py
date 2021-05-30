@@ -7,11 +7,12 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 class SendEmail:
     def __init__(self):
         # Email Access Logins
         self.username = os.getenv('EMAIL_USERNAME')
-        self.password = keyring.get_password(os.getenv('USERNAME'), os.getenv('EMAIL_USERNAME'))
+        self.password = keyring.get_password(os.getenv('USER_LOGIN'), os.getenv('EMAIL_USERNAME'))
 
         # Email addresses
         self.send_from_email = os.getenv('EMAIL_USERNAME')

@@ -12,7 +12,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
 class GetData:
-    def __init__(self, url):
+    def __init__(self):
         # Logins Access
         self.s = None
         self.username = os.getenv('USER')
@@ -22,7 +22,7 @@ class GetData:
         self.report = []
 
         # URL to Access
-        self.url = url
+        self.url = None
 
         # Tags to check
         self.tags = ['#ffff99', '#ffcccc']
@@ -40,6 +40,7 @@ class GetData:
 
     def get_summary_page(self, url):
         # Get the Raw Data
+        self.url = url
         return self.s.get(url)
 
     def get_report(self, page, which_report):
@@ -48,20 +49,22 @@ class GetData:
         if bool(soup.findAll(text="Authorization Required")):
             raise AuthException
 
+        if "Error" in soup.find('title').string:
+            # Get the first line of the error message
+            paragraphs = soup.findAll('p')
+            for paragraph in paragraphs:
+                self.report.append([self.url, self.url.split("/")[2], "",
+                                    paragraph.text.strip().split("\n")[0], ""])
+
         else:
             for tag in self.tags:
-                red_tags = soup.findAll('tr', {"bgcolor": tag})
-                for tags in red_tags:
+                color_tag = soup.findAll('tr', {"bgcolor": tag})
+                for tags in color_tag:
                     host = tags.text.strip().split("\n")[0]
                     status = tags.text.strip().split("\n")[-1]
                     style = "background-color:#ffcccc" if 'failed' in status else "background-color:#ffff99"
-                    priority = self.danger if 'failed' in status else self.medium
-                    if which_report == os.getenv('DOMAIN'):
-                        self.report.insert(priority, [self.url[0], os.getenv('BACKUP_EMAIL'), host, status, style])
-                    elif which_report == f"{os.getenv('DOMAIN')}GW":
-                        self.report.insert(priority, [self.url[1], os.getenv('BACKUP_EMAIL_GW'), host, status, style])
-                    elif which_report == f"{os.getenv('DOMAIN')}PT2":
-                        self.report.insert(priority, [self.url[2], os.getenv('BACKUP2_EMAIL'), host, status, style])
+
+                    self.report.append([self.url, self.url.split("/")[2], host, status, style])
 
 
 class AuthException(BaseException):
