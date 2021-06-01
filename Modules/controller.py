@@ -11,13 +11,10 @@ load_dotenv()
 class BackUp:
     def __init__(self):
         # URLS to access
-        self.url_domain = os.getenv('BACKUP_LINK')
-        self.url_domain_gw = os.getenv('BACKUP_LINK_GW')
-        self.url_domain2 = os.getenv('BACKUP2_LINK')
-        self.total_report = []
-
-        # Priority levels
-        self.ok = None
+        self.links = [os.getenv('BACKUP_LINK'),
+                      os.getenv('BACKUP_LINK_GW'),
+                      os.getenv('BACKUP2_LINK')
+                      ]
 
     @staticmethod
     def send_email(message):
@@ -25,10 +22,10 @@ class BackUp:
         send_email = SendEmail()
 
         if type(message) is str:
-            send_email.email = send_email.cc_email
+            send_email.email = send_email.sys_Admin
             send_email.subject = "! Error running Backup script check !"
 
-        # Get the message
+        # Create the message
         send_email.create_message(message)
 
         # Send the combined Report
@@ -41,10 +38,9 @@ class BackUp:
             # Login to Backup website
             get_data.login()
 
-            # Get the Reports for three websites
-            get_data.get_report(get_data.get_summary_page(self.url_domain), os.getenv('DOMAIN'))
-            get_data.get_report(get_data.get_summary_page(self.url_domain_gw), f"{os.getenv('DOMAIN')}GW")
-            get_data.get_report(get_data.get_summary_page(self.url_domain2), f"{os.getenv('DOMAIN')}PT2")
+            # Get the Reports from the websites
+            for link in self.links:
+                get_data.get_report(get_data.get_summary_page(link))
 
             # close the session
             get_data.s.close()

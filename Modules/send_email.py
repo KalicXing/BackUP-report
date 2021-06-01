@@ -18,6 +18,7 @@ class SendEmail:
         self.send_from_email = os.getenv('EMAIL_USERNAME')
         self.email = os.getenv('SEND_TO_EMAIL')
         self.cc_email = os.getenv('CC_EMAIL')
+        self.sys_Admin = os.getenv('SYS_ADMIN')
 
         # Custom Subject
         self.subject = None

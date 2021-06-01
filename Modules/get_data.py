@@ -27,11 +27,6 @@ class GetData:
         # Tags to check
         self.tags = ['#ffff99', '#ffcccc']
 
-        # Priority levels
-        self.danger = 1
-        self.medium = 2
-        self.ok = 3
-
     def login(self):
         # Login to the website
         self.s = requests.Session()
@@ -43,7 +38,7 @@ class GetData:
         self.url = url
         return self.s.get(url)
 
-    def get_report(self, page, which_report):
+    def get_report(self, page):
         soup = BeautifulSoup(page.text, 'html.parser')
 
         if bool(soup.findAll(text="Authorization Required")):
@@ -63,7 +58,6 @@ class GetData:
                     host = tags.text.strip().split("\n")[0]
                     status = tags.text.strip().split("\n")[-1]
                     style = "background-color:#ffcccc" if 'failed' in status else "background-color:#ffff99"
-
                     self.report.append([self.url, self.url.split("/")[2], host, status, style])
 
 
